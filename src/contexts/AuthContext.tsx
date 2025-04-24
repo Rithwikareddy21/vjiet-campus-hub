@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    // In a real app, this would make an API call to validate credentials
+    // Validate email ends with @vnrvjiet.in
     if (!email.endsWith("@vnrvjiet.in")) {
       toast({
         title: "Invalid email",
@@ -52,30 +52,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
-    // Find user by email
-    const foundUser = mockUsers.find(u => u.email === email);
+    // Find user by email from mockUsers
+    let foundUser = mockUsers.find(u => u.email === email);
     
-    if (foundUser) {
-      // In a real app, we would verify the password here
-      setUser(foundUser);
-      setIsAuthenticated(true);
-      localStorage.setItem("user", JSON.stringify(foundUser));
+    // If user doesn't exist in mockUsers, create a new one based on email
+    if (!foundUser) {
+      // Extract name from email (everything before @)
+      const name = email.split('@')[0].split('.').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ');
       
-      toast({
-        title: "Login successful",
-        description: `Welcome back, ${foundUser.name}!`,
-      });
+      // Determine role based on email
+      let role: "student" | "faculty" | "admin" = "student";
+      if (email.includes("faculty")) {
+        role = "faculty";
+      } else if (email.includes("admin")) {
+        role = "admin";
+      }
       
-      return true;
+      // Create new user
+      foundUser = {
+        id: `user-${Date.now()}`,
+        name: name,
+        email: email,
+        role: role,
+        section: role === "student" ? "CSE-A" : undefined,
+        department: "Computer Science"
+      };
     }
     
+    // Login successful
+    setUser(foundUser);
+    setIsAuthenticated(true);
+    localStorage.setItem("user", JSON.stringify(foundUser));
+    
     toast({
-      title: "Login failed",
-      description: "Invalid email or password",
-      variant: "destructive",
+      title: "Login successful",
+      description: `Welcome back, ${foundUser.name}!`,
     });
     
-    return false;
+    return true;
   };
 
   const logout = () => {

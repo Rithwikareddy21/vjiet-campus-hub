@@ -1,7 +1,9 @@
 
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
-import { themes, events } from "@/lib/data";
+import { themes, events as defaultEvents } from "@/lib/data";
+import { Event } from "@/lib/types";
 import { EventCard } from "@/components/dashboard/EventCard";
 import { Button } from "@/components/ui/button";
 import { Bookmark, GraduationCap, Play, Award, Star, ArrowLeft } from "lucide-react";
@@ -9,6 +11,13 @@ import { cn } from "@/lib/utils";
 
 const ThemeDetailPage = () => {
   const { themeId } = useParams<{ themeId: string }>();
+  const [events, setEvents] = useState<Event[]>([]);
+  
+  useEffect(() => {
+    // Load events from localStorage if available
+    const savedEvents = localStorage.getItem('events');
+    setEvents(savedEvents ? JSON.parse(savedEvents) : defaultEvents);
+  }, []);
   
   // Find the theme
   const theme = themes.find((t) => t.id === themeId);

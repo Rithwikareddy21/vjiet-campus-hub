@@ -1,8 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
-import { themes, events } from "@/lib/data";
+import { themes, events as defaultEvents } from "@/lib/data";
+import { Event } from "@/lib/types";
 import { ThemeCard } from "@/components/dashboard/ThemeCard";
 import { EventCard } from "@/components/dashboard/EventCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +12,15 @@ import { Search } from "lucide-react";
 
 const ThemesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [events, setEvents] = useState<Event[]>(defaultEvents);
+
+  useEffect(() => {
+    // Load events from localStorage if available
+    const savedEvents = localStorage.getItem('events');
+    if (savedEvents) {
+      setEvents(JSON.parse(savedEvents));
+    }
+  }, []);
 
   // Count events per theme
   const themeEventCount = themes.map((theme) => {

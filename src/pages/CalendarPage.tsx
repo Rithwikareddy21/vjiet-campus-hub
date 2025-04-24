@@ -1,7 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { events } from "@/lib/data";
+import { events as defaultEvents } from "@/lib/data";
+import { Event } from "@/lib/types";
 import { Calendar } from "@/components/ui/calendar";
 import { format, parseISO, isEqual, isSameDay, isSameMonth } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,13 @@ import { ChevronLeft, ChevronRight, CalendarClock } from "lucide-react";
 
 const CalendarPage = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    // Load events from localStorage if available
+    const savedEvents = localStorage.getItem('events');
+    setEvents(savedEvents ? JSON.parse(savedEvents) : defaultEvents);
+  }, []);
 
   // Convert event dates to Date objects
   const eventDates = events.map(event => parseISO(event.date));

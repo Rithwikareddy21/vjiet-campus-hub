@@ -38,9 +38,9 @@ const Login = () => {
         <div className="flex-1 text-center lg:text-left animate-fade-in">
           <div className="mb-6 flex justify-center lg:justify-start">
             <img 
-              src="https://picsum.photos/id/237/200/200" 
+              src="/lovable-uploads/410bfc53-a2d5-4a55-92ac-7de4d622f18f.png" 
               alt="VNR VJIET Logo" 
-              className="h-24 w-auto animate-float"
+              className="h-32 w-auto animate-float"
             />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-3 font-heading">

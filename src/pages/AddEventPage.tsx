@@ -31,16 +31,17 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { themes, venues } from "@/lib/data";
+import { themes, venues, events as eventsData } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, differenceInCalendarDays } from "date-fns";
 import { CalendarIcon, CheckCircle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Event } from "@/lib/types";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -62,7 +63,6 @@ const formSchema = z.object({
 });
 
 const AddEventPage = () => {
-  const [date, setDate] = useState<Date | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -97,12 +97,58 @@ const AddEventPage = () => {
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    // Get selected venue details
+    const selectedVenue = venues.find(v => v.name === values.venue);
+    
+    if (!selectedVenue) {
+      toast({
+        title: "Venue Error",
+        description: "Selected venue not found",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Calculate days left until event
+    const daysLeft = differenceInCalendarDays(values.date, new Date());
+    
+    // Create new event object
+    const newEvent: Event = {
+      id: `event-${Date.now()}`,
+      title: values.title,
+      theme: values.theme as any,
+      description: values.description,
+      venue: selectedVenue,
+      date: format(values.date, 'yyyy-MM-dd'),
+      startTime: values.startTime,
+      endTime: values.endTime,
+      speaker: values.speaker,
+      allowedSections: values.allowedSections,
+      maxSeats: parseInt(values.maxSeats),
+      registrationOpen: values.registrationOpen,
+      imageUrl: "/placeholder.svg",
+      gadgetRequirements: values.gadgetRequirements || undefined,
+      coordinators: values.coordinators.split(',').map(c => c.trim()),
+      status: "upcoming",
+      daysLeft: daysLeft
+    };
+    
+    // In a real application, we would send this data to a server
+    // For now, we'll update the local data array and save to localStorage
+    
+    // Add new event to events data array
+    eventsData.unshift(newEvent);
+    
+    // Save updated events to localStorage
+    localStorage.setItem('events', JSON.stringify(eventsData));
+    
     toast({
       title: "Event Created",
       description: `The event ${values.title} has been created successfully.`,
     });
-    navigate("/dashboard");
+    
+    // Redirect to the theme detail page for the new event
+    navigate(`/themes/${values.theme}`);
   };
 
   return (

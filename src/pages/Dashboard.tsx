@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Event } from "@/lib/types";
-import { events, themes } from "@/lib/data";
+import { events as defaultEvents, themes } from "@/lib/data";
 import { EventCard } from "@/components/dashboard/EventCard";
 import { ThemeCard } from "@/components/dashboard/ThemeCard";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,19 @@ import { Link } from "react-router-dom";
 const Dashboard = () => {
   const { user } = useAuth();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
   const isAdmin = user?.role === "admin" || user?.role === "faculty";
 
   useEffect(() => {
+    // Load events from localStorage if available, otherwise use default events
+    const savedEvents = localStorage.getItem('events');
+    const events = savedEvents ? JSON.parse(savedEvents) : defaultEvents;
+    setAllEvents(events);
+    
     // Filter and sort upcoming events
     const upcoming = events
-      .filter(event => event.status === "upcoming")
-      .sort((a, b) => {
+      .filter((event: Event) => event.status === "upcoming")
+      .sort((a: Event, b: Event) => {
         if (a.daysLeft !== undefined && b.daysLeft !== undefined) {
           return a.daysLeft - b.daysLeft;
         }
@@ -32,7 +38,7 @@ const Dashboard = () => {
 
   // Count events per theme
   const themeEventCount = themes.map(theme => {
-    const count = events.filter(event => event.theme === theme.id).length;
+    const count = allEvents.filter(event => event.theme === theme.id).length;
     return { ...theme, count };
   });
 
