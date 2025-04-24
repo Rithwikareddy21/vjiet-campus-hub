@@ -37,7 +37,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { format, differenceInCalendarDays } from "date-fns";
-import { CalendarIcon, CheckCircle } from "lucide-react";
+import { CalendarIcon, CheckCircle, FileImage } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -60,12 +60,14 @@ const formSchema = z.object({
   gadgetRequirements: z.string().optional(),
   coordinators: z.string().min(3, "Coordinator information is required"),
   registrationOpen: z.boolean().default(true),
+  imageUrl: z.string().optional(),
 });
 
 const AddEventPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   // If not admin or faculty, redirect
   if (user?.role !== "admin" && user?.role !== "faculty") {
@@ -93,8 +95,22 @@ const AddEventPage = () => {
       gadgetRequirements: "",
       coordinators: "",
       registrationOpen: true,
+      imageUrl: "",
     },
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        form.setValue("imageUrl", result); // Store the base64 image data
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     // Get selected venue details
@@ -112,6 +128,9 @@ const AddEventPage = () => {
     // Calculate days left until event
     const daysLeft = differenceInCalendarDays(values.date, new Date());
     
+    // Use placeholder image if no image is selected
+    const eventImage = values.imageUrl || "https://picsum.photos/800/400";
+    
     // Create new event object
     const newEvent: Event = {
       id: `event-${Date.now()}`,
@@ -126,21 +145,23 @@ const AddEventPage = () => {
       allowedSections: values.allowedSections,
       maxSeats: parseInt(values.maxSeats),
       registrationOpen: values.registrationOpen,
-      imageUrl: "/placeholder.svg",
+      imageUrl: eventImage,
       gadgetRequirements: values.gadgetRequirements || undefined,
       coordinators: values.coordinators.split(',').map(c => c.trim()),
       status: "upcoming",
       daysLeft: daysLeft
     };
     
-    // In a real application, we would send this data to a server
-    // For now, we'll update the local data array and save to localStorage
+    // Get existing events from localStorage
+    const existingEvents = localStorage.getItem('events') 
+      ? JSON.parse(localStorage.getItem('events')!) 
+      : eventsData;
     
     // Add new event to events data array
-    eventsData.unshift(newEvent);
+    existingEvents.unshift(newEvent);
     
     // Save updated events to localStorage
-    localStorage.setItem('events', JSON.stringify(eventsData));
+    localStorage.setItem('events', JSON.stringify(existingEvents));
     
     toast({
       title: "Event Created",
@@ -208,6 +229,35 @@ const AddEventPage = () => {
                       </FormItem>
                     )}
                   />
+                </div>
+                
+                {/* New Image Upload Section */}
+                <div className="space-y-2">
+                  <FormLabel>Cover Image</FormLabel>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <Input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageChange} 
+                        className="max-w-md"
+                      />
+                      <FileImage className="text-gray-400 h-5 w-5" />
+                    </div>
+                    
+                    {imagePreview && (
+                      <div className="mt-2 border rounded-md overflow-hidden">
+                        <img 
+                          src={imagePreview} 
+                          alt="Event preview"
+                          className="w-full h-40 object-cover" 
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <FormDescription>
+                    Upload a cover image for your event (recommended size: 800x400px)
+                  </FormDescription>
                 </div>
                 
                 <FormField

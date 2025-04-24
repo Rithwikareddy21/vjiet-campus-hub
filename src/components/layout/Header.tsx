@@ -46,9 +46,9 @@ export const Header = () => {
 
           <Link to="/dashboard" className="flex items-center gap-2">
             <img
-              src="https://picsum.photos/id/237/100/100"
+              src="/lovable-uploads/410bfc53-a2d5-4a55-92ac-7de4d622f18f.png"
               alt="VNR Logo"
-              className="h-8 w-auto"
+              className="h-10 w-auto"
             />
             <span className="font-heading font-semibold text-lg hidden md:inline-block">
               Career Vision Approach

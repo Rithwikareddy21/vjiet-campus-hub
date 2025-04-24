@@ -1,20 +1,33 @@
 
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
-import { events, themes } from "@/lib/data";
+import { themes } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Users, ArrowLeft, User, PlusCircle, CalendarPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Event } from "@/lib/types";
 
 const EventDetailPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const [isRegistered, setIsRegistered] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [event, setEvent] = useState<Event | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
-  // Find the event
-  const event = events.find((e) => e.id === eventId);
+  // Load events from localStorage
+  useEffect(() => {
+    const savedEvents = localStorage.getItem('events');
+    if (savedEvents) {
+      const parsedEvents = JSON.parse(savedEvents);
+      setEvents(parsedEvents);
+      // Find the specific event by ID
+      const foundEvent = parsedEvents.find((e: Event) => e.id === eventId);
+      setEvent(foundEvent || null);
+    }
+  }, [eventId]);
   
   // If event not found
   if (!event) {

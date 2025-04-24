@@ -19,12 +19,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { events } from "@/lib/data";
 import { BookOpen, Calendar, GraduationCap, User } from "lucide-react";
 import { EventCard } from "@/components/dashboard/EventCard";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, updateUserProfile } = useAuth();
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: user?.name || '',
+    section: user?.section || '',
+    department: user?.department || ''
+  });
+  
+  // Get all events from localStorage
+  const allEvents = localStorage.getItem('events') 
+    ? JSON.parse(localStorage.getItem('events')!) 
+    : events;
   
   // Simulate registered events (in a real app, this would come from the database)
-  const registeredEvents = events.slice(0, 2);
+  const registeredEvents = allEvents.slice(0, 2);
   
   // Get user initials for avatar
   const initials = user?.name
@@ -33,6 +48,31 @@ const ProfilePage = () => {
         .map((n) => n[0])
         .join("")
     : "U";
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfileData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveProfile = () => {
+    // Update the user profile in AuthContext
+    updateUserProfile({
+      ...user!,
+      name: profileData.name,
+      section: profileData.section,
+      department: profileData.department
+    });
+    
+    setIsEditing(false);
+    
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been updated successfully.",
+    });
+  };
 
   return (
     <Layout>
@@ -51,7 +91,16 @@ const ProfilePage = () => {
                     </AvatarFallback>
                   </Avatar>
                 </div>
-                <CardTitle>{user?.name}</CardTitle>
+                {isEditing ? (
+                  <Input
+                    name="name"
+                    value={profileData.name}
+                    onChange={handleInputChange}
+                    className="text-center font-bold text-xl mb-1"
+                  />
+                ) : (
+                  <CardTitle>{user?.name}</CardTitle>
+                )}
                 <CardDescription>{user?.email}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -62,18 +111,48 @@ const ProfilePage = () => {
                 </div>
                 
                 <div className="pt-4 space-y-3">
-                  {user?.section && (
-                    <div className="flex items-center text-gray-600">
-                      <User className="h-4 w-4 mr-2" />
-                      <span>Section: {user.section}</span>
-                    </div>
-                  )}
-                  
-                  {user?.department && (
-                    <div className="flex items-center text-gray-600">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      <span>Department: {user.department}</span>
-                    </div>
+                  {isEditing ? (
+                    <>
+                      <div className="flex items-center text-gray-600">
+                        <User className="h-4 w-4 mr-2" />
+                        <span className="w-full">
+                          <Input
+                            name="section"
+                            value={profileData.section}
+                            onChange={handleInputChange}
+                            placeholder="Enter your section"
+                          />
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center text-gray-600">
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        <span className="w-full">
+                          <Input
+                            name="department"
+                            value={profileData.department}
+                            onChange={handleInputChange}
+                            placeholder="Enter your department"
+                          />
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {user?.section && (
+                        <div className="flex items-center text-gray-600">
+                          <User className="h-4 w-4 mr-2" />
+                          <span>Section: {user.section}</span>
+                        </div>
+                      )}
+                      
+                      {user?.department && (
+                        <div className="flex items-center text-gray-600">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          <span>Department: {user.department}</span>
+                        </div>
+                      )}
+                    </>
                   )}
                   
                   <div className="flex items-center text-gray-600">
@@ -83,9 +162,20 @@ const ProfilePage = () => {
                 </div>
                 
                 <div className="pt-4">
-                  <Button className="w-full" variant="outline">
-                    Edit Profile
-                  </Button>
+                  {isEditing ? (
+                    <div className="flex gap-2">
+                      <Button className="w-full" onClick={handleSaveProfile}>
+                        Save Changes
+                      </Button>
+                      <Button variant="outline" onClick={() => setIsEditing(false)}>
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button className="w-full" variant="outline" onClick={() => setIsEditing(true)}>
+                      Edit Profile
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -72,9 +72,15 @@ const ThemesPage = () => {
           
           <TabsContent value="events" className="pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+              {filteredEvents.length > 0 ? (
+                filteredEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-8">
+                  <p className="text-gray-500">No events match your search criteria.</p>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>

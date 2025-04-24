@@ -9,13 +9,15 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  updateUserProfile: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   login: async () => false,
   logout: () => {},
-  isAuthenticated: false
+  isAuthenticated: false,
+  updateUserProfile: () => {}
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -104,8 +106,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const updateUserProfile = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, updateUserProfile }}>
       {children}
     </AuthContext.Provider>
   );
