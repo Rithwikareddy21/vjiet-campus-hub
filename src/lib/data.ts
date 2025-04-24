@@ -77,6 +77,17 @@ const calculateDaysLeft = (dateString: string): number => {
   return differenceInCalendarDays(eventDate, today);
 };
 
+// Event images
+const eventImages = [
+  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b", // tech/laptop
+  "https://images.unsplash.com/photo-1461749280684-dccba630e2f6", // programming
+  "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d", // person with laptop
+  "https://images.unsplash.com/photo-1518770660439-4636190af475", // circuit board
+  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5", // code matrix
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158", // woman with laptop
+  "https://images.unsplash.com/photo-1485827404703-89b55fcc595e", // robot
+];
+
 // Generate events with proper status and days left
 const generateEvents = (): Event[] => {
   const today = new Date();
@@ -94,7 +105,7 @@ const generateEvents = (): Event[] => {
       allowedSections: ["CSE-A", "CSE-B", "CSE-C", "CSE-D", "CSBS"],
       maxSeats: 450,
       registrationOpen: true,
-      imageUrl: "/placeholder.svg",
+      imageUrl: eventImages[0],
       gadgetRequirements: "Laptop (optional)",
       coordinators: ["Prof. Anand Sharma", "Prof. Lakshmi Devi"],
       status: "upcoming",
@@ -113,7 +124,7 @@ const generateEvents = (): Event[] => {
       allowedSections: ["CSE-A", "CSE-B"],
       maxSeats: 150,
       registrationOpen: true,
-      imageUrl: "/placeholder.svg",
+      imageUrl: eventImages[1],
       gadgetRequirements: "Laptop with Node.js installed",
       coordinators: ["Prof. Vivek Reddy", "Prof. Suman Rao"],
       status: "upcoming",
@@ -132,7 +143,7 @@ const generateEvents = (): Event[] => {
       allowedSections: ["CSE-C", "CSE-D", "CSBS"],
       maxSeats: 300,
       registrationOpen: true,
-      imageUrl: "/placeholder.svg",
+      imageUrl: eventImages[2],
       coordinators: ["Prof. Kiran Kumar", "Prof. Divya Reddy"],
       status: "upcoming",
       daysLeft: 3
@@ -150,7 +161,7 @@ const generateEvents = (): Event[] => {
       allowedSections: ["CSE-A", "CSE-B", "CSE-C", "CSE-D", "CSBS"],
       maxSeats: 450,
       registrationOpen: true,
-      imageUrl: "/placeholder.svg",
+      imageUrl: eventImages[3],
       coordinators: ["Prof. Mahesh Kumar", "Prof. Sreelatha"],
       status: "upcoming",
       daysLeft: 10
@@ -168,7 +179,7 @@ const generateEvents = (): Event[] => {
       allowedSections: ["CSE-D", "CSBS"],
       maxSeats: 120,
       registrationOpen: true,
-      imageUrl: "/placeholder.svg",
+      imageUrl: eventImages[4],
       gadgetRequirements: "Laptop with required software installed",
       coordinators: ["Prof. Rajendra Prasad", "Prof. Kavitha"],
       status: "upcoming",
@@ -187,7 +198,7 @@ const generateEvents = (): Event[] => {
       allowedSections: ["CSE-A", "CSE-B", "CSE-C"],
       maxSeats: 180,
       registrationOpen: false,
-      imageUrl: "/placeholder.svg",
+      imageUrl: eventImages[5],
       coordinators: ["Prof. Suresh Babu", "Prof. Rama Devi"],
       status: "completed",
       daysLeft: -2

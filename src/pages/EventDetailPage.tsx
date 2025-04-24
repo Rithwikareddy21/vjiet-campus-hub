@@ -21,11 +21,19 @@ const EventDetailPage = () => {
   useEffect(() => {
     const savedEvents = localStorage.getItem('events');
     if (savedEvents) {
-      const parsedEvents = JSON.parse(savedEvents);
-      setEvents(parsedEvents);
-      // Find the specific event by ID
-      const foundEvent = parsedEvents.find((e: Event) => e.id === eventId);
-      setEvent(foundEvent || null);
+      try {
+        const parsedEvents = JSON.parse(savedEvents);
+        setEvents(parsedEvents);
+        // Find the specific event by ID
+        const foundEvent = parsedEvents.find((e: Event) => e.id === eventId);
+        setEvent(foundEvent || null);
+        
+        console.log("Event ID from URL:", eventId);
+        console.log("Available event IDs:", parsedEvents.map((e: Event) => e.id));
+        console.log("Found event:", foundEvent);
+      } catch (error) {
+        console.error("Error parsing events:", error);
+      }
     }
   }, [eventId]);
   
@@ -38,8 +46,8 @@ const EventDetailPage = () => {
           <p className="text-gray-600 mb-6">
             Sorry, the event you are looking for does not exist.
           </p>
-          <Link to="/dashboard">
-            <Button>Back to Dashboard</Button>
+          <Link to="/themes">
+            <Button>Back to Themes</Button>
           </Link>
         </div>
       </Layout>
@@ -86,9 +94,9 @@ const EventDetailPage = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        <Link to="/dashboard" className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-primary">
+        <Link to="/themes" className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-primary">
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
+          Back to Themes
         </Link>
         
         <div className="bg-white rounded-lg overflow-hidden shadow-md border">

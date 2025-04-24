@@ -18,10 +18,20 @@ const ThemesPage = () => {
   const { isStaff } = useAuth();
 
   useEffect(() => {
-    // Load events from localStorage if available
+    // Load events from localStorage if available, otherwise use defaults
     const savedEvents = localStorage.getItem('events');
     if (savedEvents) {
-      setEvents(JSON.parse(savedEvents));
+      try {
+        const parsedEvents = JSON.parse(savedEvents);
+        setEvents(parsedEvents);
+      } catch (error) {
+        console.error("Error parsing saved events:", error);
+        // If there's an error parsing, initialize with default events
+        localStorage.setItem('events', JSON.stringify(defaultEvents));
+      }
+    } else {
+      // If no saved events, save the default events
+      localStorage.setItem('events', JSON.stringify(defaultEvents));
     }
   }, []);
 

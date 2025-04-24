@@ -14,9 +14,20 @@ const ThemeDetailPage = () => {
   const [events, setEvents] = useState<Event[]>([]);
   
   useEffect(() => {
-    // Load events from localStorage if available
+    // Load events from localStorage if available, otherwise use defaults
     const savedEvents = localStorage.getItem('events');
-    setEvents(savedEvents ? JSON.parse(savedEvents) : defaultEvents);
+    if (savedEvents) {
+      try {
+        const parsedEvents = JSON.parse(savedEvents);
+        setEvents(parsedEvents);
+      } catch (error) {
+        console.error("Error parsing saved events:", error);
+        // If there's an error parsing, initialize with default events
+        setEvents(defaultEvents);
+      }
+    } else {
+      setEvents(defaultEvents);
+    }
   }, []);
   
   // Find the theme
