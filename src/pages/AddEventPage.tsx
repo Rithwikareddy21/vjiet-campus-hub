@@ -69,17 +69,7 @@ const AddEventPage = () => {
   const { user } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
-  // If not admin or faculty, redirect
-  if (user?.role !== "admin" && user?.role !== "faculty") {
-    return <Layout>
-      <div className="flex flex-col items-center justify-center py-12">
-        <h1 className="text-3xl font-bold font-heading mb-4">Access Denied</h1>
-        <p className="text-gray-600 mb-6">You don't have permission to access this page.</p>
-        <Button onClick={() => navigate("/dashboard")}>Back to Dashboard</Button>
-      </div>
-    </Layout>;
-  }
-
+  // Initialize the form hook at the top level - before any conditional returns
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -98,6 +88,17 @@ const AddEventPage = () => {
       imageUrl: "",
     },
   });
+
+  // If not admin or faculty, render access denied
+  if (user?.role !== "admin" && user?.role !== "faculty") {
+    return <Layout>
+      <div className="flex flex-col items-center justify-center py-12">
+        <h1 className="text-3xl font-bold font-heading mb-4">Access Denied</h1>
+        <p className="text-gray-600 mb-6">You don't have permission to access this page.</p>
+        <Button onClick={() => navigate("/dashboard")}>Back to Dashboard</Button>
+      </div>
+    </Layout>;
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
