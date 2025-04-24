@@ -41,13 +41,22 @@ export const EventCard = ({ event }: EventCardProps) => {
     }
   };
 
+  // Default fallback image if the event image URL is empty or invalid
+  const fallbackImage = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
+
   return (
     <div className={cn("rounded-lg overflow-hidden shadow-md border card-hover", getThemeClass())}>
       <div className="h-40 overflow-hidden">
         <img
-          src={event.imageUrl || "https://picsum.photos/400/200"}
+          src={event.imageUrl || fallbackImage}
           alt={event.title}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (target.src !== fallbackImage) {
+              target.src = fallbackImage;
+            }
+          }}
         />
       </div>
       <div className="p-4">

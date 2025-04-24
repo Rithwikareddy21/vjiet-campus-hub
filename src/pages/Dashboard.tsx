@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Event } from "@/lib/types";
@@ -11,10 +10,9 @@ import { ChevronRight, Calendar as CalendarIcon, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, isStaff } = useAuth();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
-  const isAdmin = user?.role === "admin" || user?.role === "faculty";
 
   useEffect(() => {
     // Load events from localStorage if available, otherwise use default events
@@ -56,7 +54,7 @@ const Dashboard = () => {
                 Explore upcoming events, register for programs, and enhance your career prospects.
               </p>
             </div>
-            {isAdmin && (
+            {isStaff && (
               <Link to="/add-event">
                 <Button className="bg-primary hover:bg-primary/90">
                   <Plus className="mr-2 h-4 w-4" />

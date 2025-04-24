@@ -10,6 +10,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   updateUserProfile: (updatedUser: User) => void;
+  isStaff: boolean; // Add this to check if user is admin or faculty
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -17,20 +18,24 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => false,
   logout: () => {},
   isAuthenticated: false,
-  updateUserProfile: () => {}
+  updateUserProfile: () => {},
+  isStaff: false
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     // Check for saved user in localStorage
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
       setIsAuthenticated(true);
+      setIsStaff(parsedUser.role === "admin" || parsedUser.role === "faculty");
     }
   }, []);
 
@@ -86,6 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Login successful
     setUser(foundUser);
     setIsAuthenticated(true);
+    setIsStaff(foundUser.role === "admin" || foundUser.role === "faculty");
     localStorage.setItem("user", JSON.stringify(foundUser));
     
     toast({
@@ -99,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
+    setIsStaff(false);
     localStorage.removeItem("user");
     toast({
       title: "Logged out",
@@ -109,10 +116,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUserProfile = (updatedUser: User) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been successfully updated",
+    });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, updateUserProfile }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, updateUserProfile, isStaff }}>
       {children}
     </AuthContext.Provider>
   );

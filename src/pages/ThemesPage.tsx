@@ -8,11 +8,14 @@ import { ThemeCard } from "@/components/dashboard/ThemeCard";
 import { EventCard } from "@/components/dashboard/EventCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ThemesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [events, setEvents] = useState<Event[]>(defaultEvents);
+  const { isStaff } = useAuth();
 
   useEffect(() => {
     // Load events from localStorage if available
@@ -37,11 +40,22 @@ const ThemesPage = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-heading mb-2">Themes & Programs</h1>
-          <p className="text-gray-600">
-            Explore all five themes and their associated programs. Each theme offers unique opportunities for your personal and professional growth.
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold font-heading mb-2">Themes & Programs</h1>
+            <p className="text-gray-600">
+              Explore all five themes and their associated programs. Each theme offers unique opportunities for your personal and professional growth.
+            </p>
+          </div>
+          
+          {isStaff && (
+            <Link to="/add-event">
+              <Button className="bg-primary hover:bg-primary/90">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Event
+              </Button>
+            </Link>
+          )}
         </div>
 
         <div className="relative">
